@@ -9,6 +9,10 @@
 
 // TODO : quitter proprement en cours de partie (GUI ?).
 
+// TODO : créer une structure 'jeu' pour contenir toutes les informations
+// (plateau, taille, mouvements, couleur IA, etc.)
+// 	=> juste un pointeur à passer (et bcp moins de params)
+
 int main(int argc, char *argv[])
 {
 	Case **plateau = NULL;
@@ -39,8 +43,10 @@ int main(int argc, char *argv[])
 
 		if (reponse == 'o' || reponse == 'O')
 			plateau = ChargerPartie();
-		else
-			plateau = InitPlateau(taille);
+	}
+	else
+	{
+		plateau = InitPlateau(taille);
 	}
 
 	// "Vide" le terminal et affiche le plateau.
@@ -69,7 +75,7 @@ int main(int argc, char *argv[])
 		}
 		else
 		{
-			 coup_ia = IANiveau1(plateau, taille);
+			 coup_ia = IANiveau1(plateau, taille, 'R');
 		}
 
 		printf("\033[2J\033[1;1H");
@@ -79,8 +85,8 @@ int main(int argc, char *argv[])
 		if (nb_tour % 2 != 0)
 		{
 			printf("\nCoup IA : %c%d -> %c%d\n",
-				coup_ia->x_src + 0x41, coup_ia->y_src,
-				coup_ia->x_dst + 0x41, coup_ia->y_dst
+				coup_ia->src_x + 0x41, coup_ia->src_y,
+				coup_ia->dst_x + 0x41, coup_ia->dst_y
 			);
 			free(coup_ia);
 		}

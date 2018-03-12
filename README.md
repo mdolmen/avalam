@@ -25,3 +25,7 @@ make test
 ```bash
 make clean
 ```
+
+## Status
+
+- 1 check fails : `EvaluerValeurCoup` is wrong.

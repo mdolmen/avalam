@@ -289,7 +289,7 @@ void AfficherErreur(int code)
 	}
 }
 
-int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs)
+int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs, char couleur)
 {
 	Case c;
 	int nb_mouv = 0;
@@ -303,18 +303,35 @@ int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs)
 			if (c.taille < 0 || c.taille > 5)
 				continue;
 
-			TestMouvementPossibleCase(plateau, mouvs, &c, x, y, taille, &nb_mouv);
+			TestMouvementPossibleCase(
+				plateau, 
+				mouvs, 
+				&c, 
+				x, y, 
+				taille, 
+				&nb_mouv,
+				couleur
+			);
 		}
 	}
 
 	return nb_mouv;
 }
 
-void TestMouvementPossibleCase(Case **plateau, Mouvement *mouvs, Case *c, 
-	int x, int y, int taille, int *nb_mouv)
+void TestMouvementPossibleCase(
+	Case **plateau, 
+	Mouvement *mouvs, 
+	Case *c, 
+	int x, int y, 
+	int taille, 
+	int *nb_mouv,
+	char couleur
+)
 {
 	Case tmp;
 	int i = 0, j = 0;
+	int valeur = 0;
+	int niveau_ia = 2;
 
 	// Initialise 'i' et 'j'.
 	i = (x > 0) ? (x - 1) : x;
@@ -329,11 +346,39 @@ void TestMouvementPossibleCase(Case **plateau, Mouvement *mouvs, Case *c,
 			if (MouvementAutorise(c, &tmp)) 
 			{ 
 				// Coords de la source.
-				mouvs[*nb_mouv].x_src = x;
-				mouvs[*nb_mouv].y_src = y;
+				mouvs[*nb_mouv].src_x = x;
+				mouvs[*nb_mouv].src_y = y;
 				// Coords de la destination.
-				mouvs[*nb_mouv].x_dst = i;
-				mouvs[*nb_mouv].y_dst = j;
+				mouvs[*nb_mouv].dst_x = i;
+				mouvs[*nb_mouv].dst_y = j;
+
+				if (niveau_ia == 2)
+				{
+					valeur = EvaluerValeurCoup(
+						plateau,
+						mouvs,
+						taille,
+						x, y, // coordonnées source
+						i, j, // coordonnées destination
+						couleur
+					);
+
+					// Si la valeur retournée est 3 ou 1, le mouvement prioritaire
+					// est de la destination vers la source (et non l'inverse, on
+					// cherche à isoler le pion pour lequel on test les coups
+					// possible. Un coup est forcément bidirectionnel).
+					if (valeur == 3 || valeur == 1)
+					{
+						// Coords de la source.
+						mouvs[*nb_mouv].src_x = i;
+						mouvs[*nb_mouv].src_y = j;
+						// Coords de la destination.
+						mouvs[*nb_mouv].dst_x = x;
+						mouvs[*nb_mouv].dst_y = y;
+					}
+				}
+				
+				mouvs[*nb_mouv].valeur = valeur;
 
 				(*nb_mouv)++;
 			}
@@ -353,11 +398,39 @@ void TestMouvementPossibleCase(Case **plateau, Mouvement *mouvs, Case *c,
 		if (MouvementAutorise(c, &tmp)) 
 		{ 
 			// Coords de la source.
-			mouvs[*nb_mouv].x_src = x;
-			mouvs[*nb_mouv].y_src = y;
+			mouvs[*nb_mouv].src_x = x;
+			mouvs[*nb_mouv].src_y = y;
 			// Coords de la destination.
-			mouvs[*nb_mouv].x_dst = i;
-			mouvs[*nb_mouv].y_dst = j;
+			mouvs[*nb_mouv].dst_x = i;
+			mouvs[*nb_mouv].dst_y = j;
+
+			if (niveau_ia == 2)
+			{
+				valeur = EvaluerValeurCoup(
+					plateau,
+					mouvs,
+					taille,
+					x, y, // coordonnées source
+					i, j, // coordonnées destination
+					couleur
+				);
+
+				// Si la valeur retournée est 3 ou 1, le mouvement prioritaire
+				// est de la destination vers la source (et non l'inverse, on
+				// cherche à isoler le pion pour lequel on test les coups
+				// possible. Un coup est forcément bidirectionnel).
+				if (valeur == 3 || valeur == 1)
+				{
+					// Coords de la source.
+					mouvs[*nb_mouv].src_x = i;
+					mouvs[*nb_mouv].src_y = j;
+					// Coords de la destination.
+					mouvs[*nb_mouv].dst_x = x;
+					mouvs[*nb_mouv].dst_y = y;
+				}
+			}
+			
+			mouvs[*nb_mouv].valeur = valeur;
 
 			(*nb_mouv)++;
 		}
@@ -375,11 +448,39 @@ void TestMouvementPossibleCase(Case **plateau, Mouvement *mouvs, Case *c,
 			if (MouvementAutorise(c, &tmp)) 
 			{ 
 				// Coords de la source.
-				mouvs[*nb_mouv].x_src = x;
-				mouvs[*nb_mouv].y_src = y;
+				mouvs[*nb_mouv].src_x = x;
+				mouvs[*nb_mouv].src_y = y;
 				// Coords de la destination.
-				mouvs[*nb_mouv].x_dst = i;
-				mouvs[*nb_mouv].y_dst = j;
+				mouvs[*nb_mouv].dst_x = i;
+				mouvs[*nb_mouv].dst_y = j;
+
+				if (niveau_ia == 2)
+				{
+					valeur = EvaluerValeurCoup(
+						plateau,
+						mouvs,
+						taille,
+						x, y, // coordonnées source
+						i, j, // coordonnées destination
+						couleur
+					);
+
+					// Si la valeur retournée est 3 ou 1, le mouvement prioritaire
+					// est de la destination vers la source (et non l'inverse, on
+					// cherche à isoler le pion pour lequel on test les coups
+					// possible. Un coup est forcément bidirectionnel).
+					if (valeur == 3 || valeur == 1)
+					{
+						// Coords de la source.
+						mouvs[*nb_mouv].src_x = i;
+						mouvs[*nb_mouv].src_y = j;
+						// Coords de la destination.
+						mouvs[*nb_mouv].dst_x = x;
+						mouvs[*nb_mouv].dst_y = y;
+					}
+				}
+				
+				mouvs[*nb_mouv].valeur = valeur;
 
 				(*nb_mouv)++;
 			}
@@ -396,7 +497,7 @@ int PartieNonFinit(Case **plateau, int taille, int *rouge, int *noir)
 	if (mouvs == NULL)
 		return 0;
 
-	nb_mouv = GenererMouvements(plateau, taille, mouvs);
+	nb_mouv = GenererMouvements(plateau, taille, mouvs, 0);
 
 	if (nb_mouv == 0)
 	{
@@ -510,4 +611,93 @@ Case** ChargerPartie()
 	fclose(sauvegarde);
 
 	return plateau;
+}
+
+int EvaluerValeurCoup(
+	Case **plateau,
+	Mouvement *mouvs,
+	int taille,
+	int src_x, int src_y,
+	int dst_x, int dst_y,
+	char couleur
+)
+{
+	Case c;
+	int x1, y1;
+	int x2, y2;
+	int case_autour = 0;
+
+	//c = plateau[src_x][src_y];
+	case_autour = NbCaseAutour(plateau, taille, src_x, src_y);
+	
+	// Taille tour finale == 5 (taille max), seconde priorité.
+	x1 = mouvs[taille].src_x;
+	y1 = mouvs[taille].src_y;
+	x2 = mouvs[taille].dst_x;
+	y2 = mouvs[taille].dst_y;
+	if (plateau[x1][y1].taille + plateau[x2][y2].taille == 5)
+		return 2;
+
+	// 1 seul pion autour:
+	// 	- si le pion est de notre couleur, priorité max : return 3
+	// 	- sinon, coup défensif : return 1
+	if (case_autour == 1)
+		return (plateau[x2][y2].couleur == couleur) ? 3 : 1;
+
+	return 0;
+}
+
+int NbCaseAutour(Case **plateau, int taille, int x, int y)
+{
+	Case tmp;
+	int i = 0, j = 0;
+	int nb_case_autour = 0;
+
+	// Initialise 'i' et 'j'.
+	i = (x > 0) ? (x - 1) : x;
+	j = (y > 0) ? (y - 1) : y;
+	// Est-ce qu'une colonne existe à gauche ?
+	if (i != x)
+	{
+		// Test les cases de la colonne de gauche.
+		for (; (j <= y+1) && (j < taille); j++)
+		{
+			tmp = plateau[i][j];
+
+			if (tmp.taille != 0) 
+				nb_case_autour++;
+		}
+	}
+
+	// Réinitialise 'i' et 'j'.
+	i = x;
+	j = (y > 0) ? (y - 1) : y;
+	// Test les cases de la colonne du milieu.
+	for (; (j <= y+1) && (j < taille); j++)
+	{
+		// Case pour laquelle on test les mouvement.
+		if (j == y) { continue; }
+
+		tmp = plateau[i][j];
+
+		if (tmp.taille != 0) 
+			nb_case_autour++;
+	}
+	
+	// Réinitialise 'i' et 'j'.
+	i = (x < taille - 1) ? (x + 1) : x;
+	j = (y > 0) ? (y - 1) : y;
+	// Test les cases de la colonne de droite.
+	if (i != x)
+	{
+		for (; (j <= y+1) && (j < taille); j++)
+		{
+			tmp = plateau[i][j];
+
+			if (tmp.taille != 0) 
+				nb_case_autour++;
+		}
+	}
+
+	return nb_case_autour;
 }

@@ -166,7 +166,7 @@ START_TEST(test_generer_mouvement)
 	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
 	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * TAILLE_STD * TAILLE_STD * 8);
 
-	nb_mouv = GenererMouvements(plateau, TAILLE_STD, mouvs);
+	nb_mouv = GenererMouvements(plateau, TAILLE_STD, mouvs, 0);
 	
 	ck_assert_msg(
 		nb_mouv == 292,
@@ -268,6 +268,87 @@ START_TEST(test_charger_partie)
 }
 END_TEST
 
+/* Test de compter les pions autour d'un pion. */
+START_TEST(test_nb_case_autour_1)
+{
+	Case **plateau = NULL;
+	int nb_case_autour = 0;
+
+	plateau = InitPlateau(TAILLE_STD);
+	
+	nb_case_autour = NbCaseAutour(plateau, TAILLE_STD, 1, 2);
+
+	ck_assert_msg(
+		nb_case_autour == 7,
+		"Le nombre de pion autour de (1,2) est censé être 7."
+		"\nnb_case_autour = %d",
+		nb_case_autour
+	);
+
+	FreePlateau(plateau, TAILLE_STD);
+}
+END_TEST
+
+/* Test de compter les pions autour d'une case vide. */
+START_TEST(test_nb_case_autour_2)
+{
+	Case **plateau = NULL;
+	int nb_case_autour = 0;
+
+	plateau = InitPlateau(TAILLE_STD);
+	
+	nb_case_autour = NbCaseAutour(plateau, TAILLE_STD, 1, 7);
+
+	ck_assert_msg(
+		nb_case_autour == 1,
+		"Le nombre de pion autour de (1,7) est censé être 0."
+		"\nnb_case_autour = %d",
+		nb_case_autour
+	);
+
+	FreePlateau(plateau, TAILLE_STD);
+}
+END_TEST
+
+/* Test la priorité calculée pour un mouvement de priorité max. */
+START_TEST(test_evaluer_valeur_coup)
+{
+	Case **plateau = NULL;
+	Mouvement *mouvs;
+	int priorite = 0;
+
+	plateau = InitPlateau(TAILLE_STD);
+
+	plateau[0][2].taille = 0;
+	plateau[0][2].couleur = '.';
+	plateau[1][2].taille = 0;
+	plateau[1][2].couleur = '.';
+	plateau[2][2].taille = 0;
+	plateau[2][2].couleur = '.';
+	
+	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
+	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * TAILLE_STD * TAILLE_STD * 8);
+
+	priorite = EvaluerValeurCoup(
+		plateau,
+		mouvs,
+		TAILLE_STD,
+		1, 1, // coordonnées source
+		2, 1, // coordonnées destination
+		'R'
+	);
+
+	ck_assert_msg(
+		priorite == 3,
+		"Le mouvement aurait du être priorité 3."
+		"\npriorite = %d",
+		priorite
+	);
+
+	FreePlateau(plateau, TAILLE_STD);
+}
+END_TEST
+
 /* Crée un jeu de tests. */
 Suite *avalam_suite(void)
 {
@@ -291,6 +372,9 @@ Suite *avalam_suite(void)
 	tcase_add_test(tc_core, test_partie_finit);
 	tcase_add_test(tc_core, test_sauvegarde);
 	tcase_add_test(tc_core, test_charger_partie);
+	tcase_add_test(tc_core, test_nb_case_autour_1);
+	tcase_add_test(tc_core, test_nb_case_autour_2);
+	tcase_add_test(tc_core, test_evaluer_valeur_coup);
 
 	suite_add_tcase(s, tc_core);
 

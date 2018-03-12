@@ -10,10 +10,11 @@ typedef struct {
 } Case;
 
 typedef struct {
-	int x_src;
-	int y_src;
-	int x_dst;
-	int y_dst;
+	int src_x;
+	int src_y;
+	int dst_x;
+	int dst_y;
+	int valeur;
 } Mouvement;
 
 Case** InitPlateau(int taille);
@@ -44,14 +45,21 @@ void SaisieDeplacement(char *coords_src, char *coords_dst);
 /* Génére les mouvements possible pour une case. Retourne le nombre de mouvement
  * générés. 
  */
-int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs);
+int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs, char couleur);
 
 /*
  * Les mouvement possible pour 'case' sont enregistré dans 'mouvs'.
  * Le nombre de mouvement totale est actualisé dans 'nb_mouv'.
  */
-void TestMouvementPossibleCase(Case **plateau, Mouvement *mouvs, Case *c, 
-	int x, int y, int taille, int *nb_mouv);
+void TestMouvementPossibleCase(
+	Case **plateau, 
+	Mouvement *mouvs, 
+	Case *c, 
+	int x, int y, 
+	int taille, 
+	int *nb_mouv,
+	char couleur
+);
 
 /*
  * Affiche le nombre de points par couleur si la partie est finit (plus de
@@ -70,5 +78,18 @@ int SauvegarderPartie(Case **plateau, int taille);
 
 /* Charge une partie depuis un fichier. */
 Case** ChargerPartie();
+
+/* Compte le nombre de pion autour d'un pion donné. */
+int NbCaseAutour(Case **plateau, int taille, int x, int y);
+
+/* Evalue la valeur d'un coup pour déterminer sa prioritée. */
+int EvaluerValeurCoup(
+	Case **plateau,
+	Mouvement *mouvs,
+	int taille,
+	int src_x, int src_y,
+	int dst_x, int dst_y,
+	char couleur
+);
 
 #endif // PLATEAU_H
