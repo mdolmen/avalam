@@ -3,6 +3,12 @@
 
 #include "../include/plateau.h"
 
+#define P_TRES_HAUTE	4
+#define P_HAUTE 		3
+#define P_NORMAL 		2
+#define P_BASSE 		1
+#define P_NULLE 		0
+
 // TODO : Faire une fonction qui alloue de la mémoire et vérifie le résultat.
 // Remplacer malloc() par cette fonction.
 
@@ -623,26 +629,22 @@ int EvaluerValeurCoup(
 )
 {
 	Case c;
-	int x1, y1;
-	int x2, y2;
-	int case_autour = 0;
+	int cases_autour = 0;
 
 	//c = plateau[src_x][src_y];
-	case_autour = NbCaseAutour(plateau, taille, src_x, src_y);
+	cases_autour = NbCaseAutour(plateau, taille, src_x, src_y);
 	
 	// Taille tour finale == 5 (taille max), seconde priorité.
-	x1 = mouvs[taille].src_x;
-	y1 = mouvs[taille].src_y;
-	x2 = mouvs[taille].dst_x;
-	y2 = mouvs[taille].dst_y;
-	if (plateau[x1][y1].taille + plateau[x2][y2].taille == 5)
+	if (plateau[src_x][src_y].taille + plateau[dst_x][dst_y].taille == 5)
 		return 2;
 
 	// 1 seul pion autour:
 	// 	- si le pion est de notre couleur, priorité max : return 3
 	// 	- sinon, coup défensif : return 1
-	if (case_autour == 1)
-		return (plateau[x2][y2].couleur == couleur) ? 3 : 1;
+	if (cases_autour == 1)
+		return (plateau[dst_x][dst_y].couleur == couleur) ? 3 : 1;
+	
+	// Nb pions autour impair.
 
 	return 0;
 }

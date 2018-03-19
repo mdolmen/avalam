@@ -43,6 +43,8 @@ int main(int argc, char *argv[])
 
 		if (reponse == 'o' || reponse == 'O')
 			plateau = ChargerPartie();
+		else
+			plateau = InitPlateau(taille);
 	}
 	else
 	{

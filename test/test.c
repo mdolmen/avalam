@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <check.h>
+#include <stdio.h>
 
 #include "../include/plateau.h"
 #include "../include/ia.h"
@@ -311,7 +312,7 @@ START_TEST(test_nb_case_autour_2)
 END_TEST
 
 /* Test la priorité calculée pour un mouvement de priorité max. */
-START_TEST(test_evaluer_valeur_coup)
+START_TEST(test_evaluer_valeur_coup_1)
 {
 	Case **plateau = NULL;
 	Mouvement *mouvs;
@@ -349,6 +350,49 @@ START_TEST(test_evaluer_valeur_coup)
 }
 END_TEST
 
+/* Test la priorité calculée pour un mouvement de priorité moyenne. */
+START_TEST(test_evaluer_valeur_coup_2)
+{
+	Case **plateau = NULL;
+	Mouvement *mouvs;
+	int priorite = 0;
+
+	plateau = InitPlateau(TAILLE_STD);
+
+	plateau[1][1].taille = 3;
+	plateau[2][1].taille = 2;
+
+	plateau[0][2].taille = 0;
+	plateau[0][2].couleur = '.';
+	plateau[1][2].taille = 0;
+	plateau[1][2].couleur = '.';
+	plateau[2][2].taille = 0;
+	plateau[2][2].couleur = '.';
+	
+	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
+	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * TAILLE_STD * TAILLE_STD * 8);
+
+	puts("----- TEST -----");
+	priorite = EvaluerValeurCoup(
+		plateau,
+		mouvs,
+		TAILLE_STD,
+		1, 1, // coordonnées source
+		2, 1, // coordonnées destination
+		'R'
+	);
+
+	ck_assert_msg(
+		priorite == 2,
+		"Le mouvement aurait du être priorité 2."
+		"\npriorite = %d",
+		priorite
+	);
+
+	FreePlateau(plateau, TAILLE_STD);
+}
+END_TEST
+
 /* Crée un jeu de tests. */
 Suite *avalam_suite(void)
 {
@@ -374,7 +418,8 @@ Suite *avalam_suite(void)
 	tcase_add_test(tc_core, test_charger_partie);
 	tcase_add_test(tc_core, test_nb_case_autour_1);
 	tcase_add_test(tc_core, test_nb_case_autour_2);
-	tcase_add_test(tc_core, test_evaluer_valeur_coup);
+	tcase_add_test(tc_core, test_evaluer_valeur_coup_1);
+	tcase_add_test(tc_core, test_evaluer_valeur_coup_2);
 
 	suite_add_tcase(s, tc_core);
 
