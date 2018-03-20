@@ -3,12 +3,6 @@
 
 #include "../include/plateau.h"
 
-#define P_TRES_HAUTE	4
-#define P_HAUTE 		3
-#define P_NORMAL 		2
-#define P_BASSE 		1
-#define P_NULLE 		0
-
 // TODO : Faire une fonction qui alloue de la mémoire et vérifie le résultat.
 // Remplacer malloc() par cette fonction.
 
@@ -295,7 +289,14 @@ void AfficherErreur(int code)
 	}
 }
 
-int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs, char couleur)
+int GenererMouvements(
+	Case **plateau,
+	int taille,
+	Mouvement *mouvs,
+	char couleur,
+	int niveau_ia,
+	int *priorite_max
+)
 {
 	Case c;
 	int nb_mouv = 0;
@@ -316,7 +317,9 @@ int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs, char couleur
 				x, y, 
 				taille, 
 				&nb_mouv,
-				couleur
+				couleur,
+				niveau_ia,
+				priorite_max
 			);
 		}
 	}
@@ -331,13 +334,17 @@ void TestMouvementPossibleCase(
 	int x, int y, 
 	int taille, 
 	int *nb_mouv,
-	char couleur
+	char couleur,
+	int niveau_ia,
+	int *priorite_max
 )
 {
 	Case tmp;
 	int i = 0, j = 0;
 	int valeur = 0;
-	int niveau_ia = 2;
+
+	// Réinitialise la priorité max du tour précédent.
+	priorite_max = 0;
 
 	// Initialise 'i' et 'j'.
 	i = (x > 0) ? (x - 1) : x;
@@ -348,6 +355,7 @@ void TestMouvementPossibleCase(
 		// Test les cases de la colonne de gauche.
 		for (; (j <= y+1) && (j < taille); j++)
 		{
+			// TODO : factoriser tout ça dans une fonction.
 			tmp = plateau[i][j];
 			if (MouvementAutorise(c, &tmp)) 
 			{ 
@@ -382,6 +390,10 @@ void TestMouvementPossibleCase(
 						mouvs[*nb_mouv].dst_x = x;
 						mouvs[*nb_mouv].dst_y = y;
 					}
+
+					if (priorite_max)
+						if (valeur > *priorite_max)
+							*priorite_max = valeur;
 				}
 				
 				mouvs[*nb_mouv].valeur = valeur;
@@ -400,6 +412,7 @@ void TestMouvementPossibleCase(
 		// Case pour laquelle on test les mouvement.
 		if (j == y) { continue; }
 
+		// TODO : factoriser tout ça dans une fonction.
 		tmp = plateau[i][j];
 		if (MouvementAutorise(c, &tmp)) 
 		{ 
@@ -434,6 +447,10 @@ void TestMouvementPossibleCase(
 					mouvs[*nb_mouv].dst_x = x;
 					mouvs[*nb_mouv].dst_y = y;
 				}
+
+				if (priorite_max)
+					if (valeur > *priorite_max)
+						*priorite_max = valeur;
 			}
 			
 			mouvs[*nb_mouv].valeur = valeur;
@@ -450,6 +467,7 @@ void TestMouvementPossibleCase(
 	{
 		for (; (j <= y+1) && (j < taille); j++)
 		{
+			// TODO : factoriser tout ça dans une fonction.
 			tmp = plateau[i][j];
 			if (MouvementAutorise(c, &tmp)) 
 			{ 
@@ -484,6 +502,10 @@ void TestMouvementPossibleCase(
 						mouvs[*nb_mouv].dst_x = x;
 						mouvs[*nb_mouv].dst_y = y;
 					}
+
+					if (priorite_max)
+						if (valeur > *priorite_max)
+							*priorite_max = valeur;
 				}
 				
 				mouvs[*nb_mouv].valeur = valeur;
@@ -503,7 +525,7 @@ int PartieNonFinit(Case **plateau, int taille, int *rouge, int *noir)
 	if (mouvs == NULL)
 		return 0;
 
-	nb_mouv = GenererMouvements(plateau, taille, mouvs, 0);
+	nb_mouv = GenererMouvements(plateau, taille, mouvs, 0, 1, NULL);
 
 	if (nb_mouv == 0)
 	{
@@ -628,25 +650,24 @@ int EvaluerValeurCoup(
 	char couleur
 )
 {
-	Case c;
+	Case src, dst;
 	int cases_autour = 0;
 
-	//c = plateau[src_x][src_y];
 	cases_autour = NbCaseAutour(plateau, taille, src_x, src_y);
+	src = plateau[src_x][src_y];
+	dst = plateau[dst_x][dst_y];
 	
 	// Taille tour finale == 5 (taille max), seconde priorité.
-	if (plateau[src_x][src_y].taille + plateau[dst_x][dst_y].taille == 5)
-		return 2;
+	if (src.taille + dst.taille == 5 && src.couleur == couleur)
+		return P_HAUTE;
 
 	// 1 seul pion autour:
-	// 	- si le pion est de notre couleur, priorité max : return 3
-	// 	- sinon, coup défensif : return 1
+	// 	- si le pion est de notre couleur, priorité max
+	// 	- sinon, coup défensif
 	if (cases_autour == 1)
-		return (plateau[dst_x][dst_y].couleur == couleur) ? 3 : 1;
+		return (dst.couleur == couleur) ? P_TRES_HAUTE : P_MOYENNE;
 	
-	// Nb pions autour impair.
-
-	return 0;
+	return P_BASSE;
 }
 
 int NbCaseAutour(Case **plateau, int taille, int x, int y)

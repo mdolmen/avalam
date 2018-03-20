@@ -2,7 +2,14 @@
 #define PLATEAU_H
 
 #define TAILLE_STD 9
+
 #define COL_MAX 5
+
+#define P_TRES_HAUTE	4
+#define P_HAUTE 		3
+#define P_MOYENNE 		2
+#define P_BASSE 		1
+#define P_NULLE 		0
 
 typedef struct {
 	int taille;
@@ -45,7 +52,14 @@ void SaisieDeplacement(char *coords_src, char *coords_dst);
 /* Génére les mouvements possible pour une case. Retourne le nombre de mouvement
  * générés. 
  */
-int GenererMouvements(Case **plateau, int taille, Mouvement *mouvs, char couleur);
+int GenererMouvements(
+	Case **plateau, 
+	int taille, 
+	Mouvement *mouvs, 
+	char couleur,
+	int niveau_ia,
+	int *priorite_max
+);
 
 /*
  * Les mouvement possible pour 'case' sont enregistré dans 'mouvs'.
@@ -58,7 +72,9 @@ void TestMouvementPossibleCase(
 	int x, int y, 
 	int taille, 
 	int *nb_mouv,
-	char couleur
+	char couleur,
+	int niveau_ia,
+	int *priorite_max
 );
 
 /*

@@ -5,26 +5,50 @@
 #include "../include/ia.h"
 #include "../include/plateau.h"
 
-#define PRIORITE_MAX 3
-
-Mouvement *IANiveau1(Case **plateau, int taille, char couleur)
+Mouvement *IA(Case **plateau, int taille, char couleur, int niveau_ia)
 {
 	Mouvement *mouvs;
 	Mouvement *m;
+	int priorite_max = 0;
 	int nb_mouv = 0;
+	int index = 0;
 	time_t t;
 
 	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
 	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * taille * taille * 8);
+	
 	m = (Mouvement *)malloc(sizeof(Mouvement));
+	
 	if (mouvs == NULL || m == NULL)
 		return NULL;
 
-	nb_mouv = GenererMouvements(plateau, taille, mouvs, couleur);
-	
 	// Initialise le générateur de nombre aléatoire.
 	srand(time(&t));
-	*m = mouvs[rand() % nb_mouv];
+
+	if (niveau_ia == 1)
+	{
+		nb_mouv = GenererMouvements(plateau, taille, mouvs, couleur, 1, NULL);
+		
+		*m = mouvs[rand() % nb_mouv];
+	}
+	else
+	{
+		nb_mouv = GenererMouvements(plateau, taille, mouvs, couleur, 2, &priorite_max);
+
+		index = rand() % nb_mouv;
+
+		// Prend le premier mouvement de priorite la plus haute parmit la liste
+		// de mouvements. Parcour la liste de manière circulaire en commencant à
+		// un index aléatoire pour mieux réparir les coups sur le plateau de
+		// jeu.
+		for ( ; mouvs[index].valeur != priorite_max; index++)
+		{
+			if (index == nb_mouv)
+				index = 0;
+		}
+
+		*m = mouvs[index];
+	}
 	
 	// Execute le coup.
 	DeplacerPion(plateau, taille, m->src_x, m->src_y, m->dst_x, m->dst_y);

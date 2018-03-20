@@ -340,17 +340,17 @@ START_TEST(test_evaluer_valeur_coup_1)
 	);
 
 	ck_assert_msg(
-		priorite == 3,
-		"Le mouvement aurait du être priorité 3."
+		priorite == P_TRES_HAUTE,
+		"Le mouvement aurait du être priorité %d."
 		"\npriorite = %d",
-		priorite
+		P_TRES_HAUTE, priorite
 	);
 
 	FreePlateau(plateau, TAILLE_STD);
 }
 END_TEST
 
-/* Test la priorité calculée pour un mouvement de priorité moyenne. */
+/* Test la priorité calculée pour un mouvement de priorité haute. */
 START_TEST(test_evaluer_valeur_coup_2)
 {
 	Case **plateau = NULL;
@@ -372,21 +372,59 @@ START_TEST(test_evaluer_valeur_coup_2)
 	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
 	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * TAILLE_STD * TAILLE_STD * 8);
 
-	puts("----- TEST -----");
 	priorite = EvaluerValeurCoup(
 		plateau,
 		mouvs,
 		TAILLE_STD,
 		1, 1, // coordonnées source
 		2, 1, // coordonnées destination
-		'R'
+		'N'
 	);
 
 	ck_assert_msg(
-		priorite == 2,
-		"Le mouvement aurait du être priorité 2."
+		priorite == P_HAUTE,
+		"Le mouvement aurait du être priorité %d."
 		"\npriorite = %d",
-		priorite
+		P_HAUTE, priorite
+	);
+
+	FreePlateau(plateau, TAILLE_STD);
+}
+END_TEST
+
+/* Test la priorité calculée pour un mouvement de priorité moyenne. */
+START_TEST(test_evaluer_valeur_coup_3)
+{
+	Case **plateau = NULL;
+	Mouvement *mouvs;
+	int priorite = 0;
+
+	plateau = InitPlateau(TAILLE_STD);
+
+	plateau[0][2].taille = 0;
+	plateau[0][2].couleur = '.';
+	plateau[1][2].taille = 0;
+	plateau[1][2].couleur = '.';
+	plateau[2][2].taille = 0;
+	plateau[2][2].couleur = '.';
+	
+	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
+	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * TAILLE_STD * TAILLE_STD * 8);
+
+	priorite = EvaluerValeurCoup(
+		plateau,
+		mouvs,
+		TAILLE_STD,
+		1, 1, // coordonnées source
+		2, 1, // coordonnées destination
+		'N'
+	);
+
+	ck_assert_msg(
+		priorite == P_MOYENNE,
+		"Le mouvement aurait du être priorité %d."
+		"\npriorite = %d",
+		P_MOYENNE, priorite
 	);
 
 	FreePlateau(plateau, TAILLE_STD);
@@ -420,6 +458,7 @@ Suite *avalam_suite(void)
 	tcase_add_test(tc_core, test_nb_case_autour_2);
 	tcase_add_test(tc_core, test_evaluer_valeur_coup_1);
 	tcase_add_test(tc_core, test_evaluer_valeur_coup_2);
+	tcase_add_test(tc_core, test_evaluer_valeur_coup_3);
 
 	suite_add_tcase(s, tc_core);
 

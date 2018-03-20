@@ -26,7 +26,7 @@ int main(int argc, char *argv[])
 	int ret;
 	FILE* sauvegarde;
 	char reponse;
-	
+
 	taille = TAILLE_STD;
 
 	// TODO : plus de test sur la valeur entrée et le résultat de strtol().
@@ -70,17 +70,19 @@ int main(int argc, char *argv[])
 					coords_src[0] - 0x41, coords_src[1] - 0x30,
 					coords_dst[0] - 0x41, coords_dst[1] - 0x30
 				);
-
+			
 				if (ret)
 					AfficherErreur(ret);
 			} while (ret != 0);
 		}
 		else
 		{
-			 coup_ia = IANiveau1(plateau, taille, 'R');
+			 // TODO : configurer le niveau de l'IA dans l'interface graphique.
+			 //coup_ia = IA(plateau, taille, 'R');
+			 coup_ia = IA(plateau, taille, 'N', 2);
 		}
 
-		printf("\033[2J\033[1;1H");
+		//printf("\033[2J\033[1;1H");
 		AfficherPlateau(plateau, taille);
 
 		// Affiche le coup joué par l'IA.
@@ -97,7 +99,7 @@ int main(int argc, char *argv[])
 	}
 
 	// La partie est finie : affiche les scores.
-	printf("\nRouge : %d pts\n", rouge);
+	printf("Rouge : %d pts\n", rouge);
 	printf("Noir : %d pts\n", noir);
 
 	FreePlateau(plateau, taille);

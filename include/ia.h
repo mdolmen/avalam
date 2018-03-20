@@ -3,6 +3,6 @@
 
 #include "../include/plateau.h"
 
-Mouvement *IANiveau1(Case **plateau, int taille, char couleur);
+Mouvement *IA(Case **plateau, int taille, char couleur, int niveau_ia);
 
 #endif // AI_H
