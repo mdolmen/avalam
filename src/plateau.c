@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "../include/plateau.h"
+#include "../lib/graphics.h"
 
 // TODO : Faire une fonction qui alloue de la mémoire et vérifie le résultat.
 // Remplacer malloc() par cette fonction.
@@ -151,6 +152,75 @@ void AfficherPlateau(Case **plateau, int taille)
 	
 	AfficherDelimiteur(taille);
 
+}
+
+void AfficherPlateauGUI(
+	Case **plateau, 
+	int taille,
+	int largeur_plateau,
+	int hauteur_plateau
+)
+{
+	Case c;
+	char lettre = 'A';
+	int rayon;
+	int largeur, hauteur;
+	int x_pion, y_pion;
+
+	// Affiche les coordonnées horizontales.
+	/*
+	printf("    ");
+	for (int i=0; i < (taille* 5); ++i)
+	{
+		if (i % 5 == 0)
+			putchar(lettre++);
+		else
+			putchar(' ');
+	}
+	putchar('\n');
+	*/
+
+	// Dimensions d'un pion.
+	largeur = largeur_plateau / taille;
+	hauteur = hauteur_plateau / taille;
+	rayon = largeur / 2;
+
+	y_pion = hauteur_plateau - rayon;
+	x_pion = rayon >> 1;
+	
+	printf("rayon: %d - rayon * 2: %d\n", rayon, rayon << 1);
+	printf("x: %d - y: %d\n", x_pion, y_pion);
+	
+	for (int y = 0; y < taille; y++)
+	{
+		for (int x = 0; x < taille; x++)
+		{
+			c = plateau[x][y];
+
+			if (c.taille > 0)
+				gr_fill_circle(x_pion, y_pion, rayon);
+
+			/*
+			// Affiche les coordonnées verticales.
+			if (x == 0)
+				printf("%d ", y);
+
+			if (c.taille > 0)
+				printf("| %d%c ", c.taille, c.couleur);
+			else
+				printf("|    ");
+
+			// Bord droit du tableau.
+			if (x == taille-1)
+				putchar('|');
+			*/
+			// On décale le x du prochian cercle de rayon * 2.
+			x_pion += rayon << 1;
+			x_pion += 2;
+		}
+		x_pion = rayon >> 1;
+		y_pion -= rayon << 1;
+	}
 }
 
 void AfficherDelimiteur(int taille)

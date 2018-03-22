@@ -34,6 +34,14 @@ void FreePlateau(Case **plateau, int taille);
 /* Affiche le plateau. */
 void AfficherPlateau(Case **plateau, int taille);
 
+/* Affiche le plateau avec une interface graphique. */
+void AfficherPlateauGUI(
+	Case **plateau, 
+	int taille,
+	int largeur_plateau,
+	int hauteur_plateau
+);
+
 /* Affiche une ligne pour quadriller le plateau. */
 void AfficherDelimiteur(int taille);
 

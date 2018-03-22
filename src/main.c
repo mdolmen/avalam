@@ -1,8 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "../include/plateau.h"
 #include "../include/ia.h"
+#include "../lib/graphics.h"
+
+#define GEOMETRIE " 560x560"
+#define LARGEUR 560
+#define HAUTEUR 560
+#define RAYON 30
 
 // TODO : ajouter une vérification des valeurs renvoyé par certaines fonctions
 // (celles qui renvoient un pointeur).
@@ -33,6 +40,17 @@ int main(int argc, char *argv[])
 	if (argc == 2)
 		taille = strtol(argv[1], NULL, 10);
 	
+	gr_open_graph(GEOMETRIE);
+
+	plateau = InitPlateau(taille);
+	
+	AfficherPlateauGUI(plateau, taille, LARGEUR, HAUTEUR);
+
+	gr_wait_event(KEY_PRESSED);
+
+    gr_close_graph();
+	
+	/*
 	// Charge une partie sauvegardée.
 	if ( (sauvegarde = fopen("sauvegarde.txt", "r") ) != NULL)
 	{
@@ -103,6 +121,7 @@ int main(int argc, char *argv[])
 	printf("Noir : %d pts\n", noir);
 
 	FreePlateau(plateau, taille);
+	*/
 
 	return 0;
 }
