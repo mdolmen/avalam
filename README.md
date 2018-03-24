@@ -28,4 +28,5 @@ make clean
 
 ## Status
 
-- 1 check fails : `EvaluerValeurCoup` is wrong.
+Working version. There is still work to be done to have a real game but it's
+good enough to play, load and save a game.
