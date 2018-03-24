@@ -6,10 +6,11 @@
 #include "../include/ia.h"
 #include "../lib/graphics.h"
 
-#define GEOMETRIE " 560x560"
-#define LARGEUR 560
-#define HAUTEUR 560
+#define GEOMETRIE " 620x620"
+#define LARGEUR 620
+#define HAUTEUR 620
 #define RAYON 30
+#define DIAMETRE 60
 
 // TODO : ajouter une vérification des valeurs renvoyé par certaines fonctions
 // (celles qui renvoient un pointeur).
@@ -20,16 +21,41 @@
 // (plateau, taille, mouvements, couleur IA, etc.)
 // 	=> juste un pointeur à passer (et bcp moins de params)
 
+int partie_finie = 0;
+Case **plateau = NULL;
+int taille;
+
+void cleanup()
+{
+    char reponse = '\0';
+
+    if (!partie_finie)
+    {
+		printf("\n\nLa partie n'est pas finie, voulez-vous l'enregistrer ? (o/n) : ");
+		scanf(" %c", &reponse);
+
+		if (reponse == 'o' || reponse == 'O')
+        {
+			if ( EXIT_SUCCESS == SauvegarderPartie(plateau, taille) )
+                puts("Partie sauvegardée!");
+            else
+                puts("Erreur lors de la sauvegarde..");
+        }
+    }
+}
+
 int main(int argc, char *argv[])
 {
-	Case **plateau = NULL;
 	Mouvement *coup_ia = NULL;
 	char coords_src[3];
 	char coords_dst[3];
-	int nb_tour = 0;
+	
+    int src_x, src_y;
+    int dst_x, dst_y;
+    
+    int nb_tour = 0;
 	int rouge = 0;
 	int noir = 0;
-	int taille;
 	int ret;
 	FILE* sauvegarde;
 	char reponse;
@@ -40,17 +66,6 @@ int main(int argc, char *argv[])
 	if (argc == 2)
 		taille = strtol(argv[1], NULL, 10);
 	
-	gr_open_graph(GEOMETRIE);
-
-	plateau = InitPlateau(taille);
-	
-	AfficherPlateauGUI(plateau, taille, LARGEUR, HAUTEUR);
-
-	gr_wait_event(KEY_PRESSED);
-
-    gr_close_graph();
-	
-	/*
 	// Charge une partie sauvegardée.
 	if ( (sauvegarde = fopen("sauvegarde.txt", "r") ) != NULL)
 	{
@@ -69,25 +84,40 @@ int main(int argc, char *argv[])
 		plateau = InitPlateau(taille);
 	}
 
+    // TODO : choisir entre console et GUI
+    //
 	// "Vide" le terminal et affiche le plateau.
-	printf("\033[2J\033[1;1H");
-	AfficherPlateau(plateau, taille);
+	//printf("\033[2J\033[1;1H");
+	//AfficherPlateau(plateau, taille);
+
+    atexit(cleanup);
+
+    // Initialise l'interfae graphique.
+	gr_open_graph(GEOMETRIE);
+	AfficherPlateauGUI(plateau, taille, LARGEUR, HAUTEUR, RAYON);
 
 	// Boucle du jeu.
 	while ( PartieNonFinit(plateau, taille, &rouge, &noir) )
 	{
 		if (nb_tour % 2 == 0)
 		{
-			// Demande un déplacement jusqu'à ce qu'un correct soit fournit.
+            // Demande un déplacement jusqu'à ce qu'un correct soit fournit.
 			do {
-				SaisieDeplacement(coords_src, coords_dst);
+				SaisieDeplacementGUI(taille, DIAMETRE, &src_x, &src_y, &dst_x, &dst_y);
 
 				// Manipulation du code ASCII des caractères saisis pour avoir un
 				// nombre entre 0 et 9.
-				ret = DeplacerPion(plateau, taille, 
-					coords_src[0] - 0x41, coords_src[1] - 0x30,
-					coords_dst[0] - 0x41, coords_dst[1] - 0x30
-				);
+				//ret = DeplacerPion(plateau, taille, 
+				//	coords_src[0] - 0x41, coords_src[1] - 0x30,
+				//	coords_dst[0] - 0x41, coords_dst[1] - 0x30
+				//);
+
+                ret = DeplacerPion(
+                    plateau,
+                    taille,
+                    src_x, src_y,
+                    dst_x, dst_y
+                );
 			
 				if (ret)
 					AfficherErreur(ret);
@@ -101,7 +131,8 @@ int main(int argc, char *argv[])
 		}
 
 		//printf("\033[2J\033[1;1H");
-		AfficherPlateau(plateau, taille);
+        //AfficherPlateau(plateau, taille);
+	    AfficherPlateauGUI(plateau, taille, LARGEUR, HAUTEUR, RAYON);
 
 		// Affiche le coup joué par l'IA.
 		if (nb_tour % 2 != 0)
@@ -115,13 +146,15 @@ int main(int argc, char *argv[])
 		
 		nb_tour++;
 	}
+    partie_finie = 1;
 
 	// La partie est finie : affiche les scores.
 	printf("Rouge : %d pts\n", rouge);
 	printf("Noir : %d pts\n", noir);
 
 	FreePlateau(plateau, taille);
-	*/
+
+    gr_close_graph();
 
 	return 0;
 }

@@ -39,7 +39,8 @@ void AfficherPlateauGUI(
 	Case **plateau, 
 	int taille,
 	int largeur_plateau,
-	int hauteur_plateau
+	int hauteur_plateau,
+    int rayon
 );
 
 /* Affiche une ligne pour quadriller le plateau. */
@@ -56,6 +57,13 @@ int MouvementAutorise(Case *src, Case *dst);
 void AfficherErreur(int code);
 
 void SaisieDeplacement(char *coords_src, char *coords_dst);
+
+void SaisieDeplacementGUI(
+    int taille,
+    int diametre, 
+    int *src_x, int *src_y,
+    int *dst_x, int *dst_y
+);
 
 /* Génére les mouvements possible pour une case. Retourne le nombre de mouvement
  * générés. 

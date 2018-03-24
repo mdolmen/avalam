@@ -167,7 +167,14 @@ START_TEST(test_generer_mouvement)
 	// La tour peut être déplacer sur 1 de ces 8 pions adjacents.
 	mouvs = (Mouvement *)malloc(sizeof(Mouvement) * TAILLE_STD * TAILLE_STD * 8);
 
-	nb_mouv = GenererMouvements(plateau, TAILLE_STD, mouvs, 0);
+	nb_mouv = GenererMouvements(
+        plateau, 
+        TAILLE_STD, 
+        mouvs, 
+        0,
+        0,
+        NULL
+    );
 	
 	ck_assert_msg(
 		nb_mouv == 292,

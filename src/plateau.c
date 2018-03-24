@@ -158,68 +158,72 @@ void AfficherPlateauGUI(
 	Case **plateau, 
 	int taille,
 	int largeur_plateau,
-	int hauteur_plateau
+	int hauteur_plateau,
+    int rayon
 )
 {
 	Case c;
 	char lettre = 'A';
-	int rayon;
-	int largeur, hauteur;
 	int x_pion, y_pion;
-
-	// Affiche les coordonnées horizontales.
-	/*
-	printf("    ");
-	for (int i=0; i < (taille* 5); ++i)
-	{
-		if (i % 5 == 0)
-			putchar(lettre++);
-		else
-			putchar(' ');
-	}
-	putchar('\n');
-	*/
-
-	// Dimensions d'un pion.
-	largeur = largeur_plateau / taille;
-	hauteur = hauteur_plateau / taille;
-	rayon = largeur / 2;
+    int diametre = 0;
 
 	y_pion = hauteur_plateau - rayon;
-	x_pion = rayon >> 1;
+	x_pion = rayon;
+    diametre = rayon << 1;
 	
-	printf("rayon: %d - rayon * 2: %d\n", rayon, rayon << 1);
-	printf("x: %d - y: %d\n", x_pion, y_pion);
-	
+    // Vide le contenu de la fenêtre graphique.
+    gr_clear_graph();
+
+    // Décalage en haut à gauche.
+    x_pion += diametre;
+    // Affiche les coordonnées horizontales.
+    for (int x = 0; x < taille; x++)
+    {
+        gr_moveto(x_pion, y_pion);
+        gr_set_color(black);
+        gr_draw_char(lettre++);
+        x_pion += diametre;
+    }
+    x_pion = rayon;
+    y_pion -= diametre;
+
 	for (int y = 0; y < taille; y++)
 	{
+        // Affiche les coordonnées verticale.
+        gr_set_color(black);
+        gr_moveto(x_pion, y_pion);
+        gr_draw_char('0' + y);
+
+        x_pion += diametre;
+
 		for (int x = 0; x < taille; x++)
 		{
 			c = plateau[x][y];
 
+
+            // Affiche un pion.
 			if (c.taille > 0)
+            {
+                if (c.couleur == 'R')
+                    gr_set_color(red);
+                else
+                    gr_set_color(black);
+
 				gr_fill_circle(x_pion, y_pion, rayon);
 
-			/*
-			// Affiche les coordonnées verticales.
-			if (x == 0)
-				printf("%d ", y);
+                // Indique la taille de la tour.
+                gr_set_color(white);
+                // Hack pour ajuster les coordonnées au centre.
+                gr_moveto(x_pion-2, y_pion-4);
+                gr_draw_char(c.taille + '0');
+            }
 
-			if (c.taille > 0)
-				printf("| %d%c ", c.taille, c.couleur);
-			else
-				printf("|    ");
-
-			// Bord droit du tableau.
-			if (x == taille-1)
-				putchar('|');
-			*/
-			// On décale le x du prochian cercle de rayon * 2.
-			x_pion += rayon << 1;
-			x_pion += 2;
+			// On décale le x du prochain cercle de rayon * 2.
+			x_pion += diametre;
 		}
-		x_pion = rayon >> 1;
-		y_pion -= rayon << 1;
+
+	    x_pion = rayon;
+		y_pion -= diametre;
 	}
 }
 
@@ -339,6 +343,27 @@ void SaisieDeplacement(char *coords_src, char *coords_dst)
 	coords_dst[2] = '\0';
 }
 
+void SaisieDeplacementGUI(
+    int taille,
+    int diametre, 
+    int *src_x, int *src_y, 
+    int *dst_x, int *dst_y
+)
+{
+    struct status *io_status = NULL;
+
+    io_status = gr_wait_event(BUTTON_DOWN);
+    *src_x = (io_status->mouse_x / diametre) - 1;
+    // L'indice le plus petit en y dans la structure du plateau correspond au
+    // pion du haut de la fenêtre graphique. Cependant, la valeur en y la plus
+    // haute (pour la souris) correspond au haut de la fenêtre graphique.
+    *src_y = (taille - 1) - (io_status->mouse_y / diametre);
+
+    io_status = gr_wait_event(BUTTON_DOWN);
+    *dst_x = (io_status->mouse_x / diametre) - 1;
+    *dst_y = (taille - 1) - (io_status->mouse_y / diametre);
+}
+
 void AfficherErreur(int code)
 {
 	switch (code)
@@ -370,6 +395,10 @@ int GenererMouvements(
 {
 	Case c;
 	int nb_mouv = 0;
+
+	// Réinitialise la priorité.
+    if (priorite_max)
+	    *priorite_max = P_BASSE;
 
 	// Parcours l'ensemble du plateau.
 	for (int x = 0; x < taille; x++)
@@ -412,9 +441,6 @@ void TestMouvementPossibleCase(
 	Case tmp;
 	int i = 0, j = 0;
 	int valeur = 0;
-
-	// Réinitialise la priorité max du tour précédent.
-	priorite_max = 0;
 
 	// Initialise 'i' et 'j'.
 	i = (x > 0) ? (x - 1) : x;

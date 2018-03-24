@@ -4,9 +4,9 @@
 X11_INCLUDES=-I/usr/include/X11/
 X11_LINK=-L/usr/lib64/X11/ -lX11
 CC=gcc
-CFLAGS=$(X11_INCLUDES) 
-LIB=~/Documents/avalam/lib
-INCLUDE=~/Documents/avalam/lib
+CFLAGS=$(X11_INCLUDES) -fPIC 
+LIB=../
+INCLUDE=../
 
 #-O -fno-defer-pop -Wall
 RANLIB=ranlib
