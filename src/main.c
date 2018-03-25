@@ -3,12 +3,18 @@
 #include <math.h>
 
 #include "../include/plateau.h"
+#include "../include/avalam.h"
 #include "../include/ia.h"
 #include "../lib/graphics.h"
 
 #define GEOMETRIE " 620x620"
-#define LARGEUR 620
-#define HAUTEUR 620
+
+// Volontairement plus petits que les dimensions de la fenêtre pour ne pas
+// prendre en compte la marge lors du calcul des coordonnées au clic de la
+// souris.
+#define LARGEUR 600
+#define HAUTEUR 600
+
 #define RAYON 30
 #define DIAMETRE 60
 
@@ -43,6 +49,10 @@ void cleanup()
                 puts("Erreur lors de la sauvegarde..");
         }
     }
+
+	FreePlateau(plateau, taille);
+
+    gr_close_graph();
 }
 
 int main(int argc, char *argv[])
@@ -142,7 +152,6 @@ int main(int argc, char *argv[])
 				coup_ia->src_x + 0x41, coup_ia->src_y,
 				coup_ia->dst_x + 0x41, coup_ia->dst_y
 			);
-			free(coup_ia);
 		}
 		
 		nb_tour++;

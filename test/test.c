@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "../include/plateau.h"
+#include "../include/avalam.h"
 #include "../include/ia.h"
 
 START_TEST(test_init_plateau)
