@@ -15,8 +15,6 @@
 // TODO : ajouter une vérification des valeurs renvoyé par certaines fonctions
 // (celles qui renvoient un pointeur).
 
-// TODO : quitter proprement en cours de partie (GUI ?).
-
 // TODO : créer une structure 'jeu' pour contenir toutes les informations
 // (plateau, taille, mouvements, couleur IA, etc.)
 // 	=> juste un pointeur à passer (et bcp moins de params)
@@ -25,6 +23,9 @@ int partie_finie = 0;
 Case **plateau = NULL;
 int taille;
 
+/*
+ * Fonction exécutée lorsque le programme quitte normalement.
+ */
 void cleanup()
 {
     char reponse = '\0';
