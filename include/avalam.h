@@ -70,14 +70,4 @@ int PartieNonFinit(Case **plateau, int taille, int *rouge, int *noir);
  */
 void CompterPoints(Case **plateau, int taille, int *rouge, int *noir);
 
-/* Evalue la valeur d'un coup pour déterminer sa prioritée. */
-int EvaluerValeurCoup(
-	Case **plateau,
-	Mouvement *mouvs,
-	int taille,
-	int src_x, int src_y,
-	int dst_x, int dst_y,
-	char couleur
-);
-
 #endif // AVALAM_H

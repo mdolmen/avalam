@@ -3,6 +3,7 @@
 
 #include "../include/plateau.h"
 #include "../include/avalam.h"
+#include "../include/ia.h"
 
 int MouvementAutorise(Case *src, Case *dst)
 {

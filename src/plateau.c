@@ -430,35 +430,6 @@ Case** ChargerPartie()
 	return plateau;
 }
 
-int EvaluerValeurCoup(
-	Case **plateau,
-	Mouvement *mouvs,
-	int taille,
-	int src_x, int src_y,
-	int dst_x, int dst_y,
-	char couleur
-)
-{
-	Case src, dst;
-	int cases_autour = 0;
-
-	cases_autour = NbCaseAutour(plateau, taille, src_x, src_y);
-	src = plateau[src_x][src_y];
-	dst = plateau[dst_x][dst_y];
-	
-	// Taille tour finale == 5 (taille max), seconde priorité.
-	if (src.taille + dst.taille == 5 && src.couleur == couleur)
-		return P_HAUTE;
-
-	// 1 seul pion autour:
-	// 	- si le pion est de notre couleur, priorité max
-	// 	- sinon, coup défensif
-	if (cases_autour == 1)
-		return (dst.couleur == couleur) ? P_TRES_HAUTE : P_MOYENNE;
-	
-	return P_BASSE;
-}
-
 int NbCaseAutour(Case **plateau, int taille, int x, int y)
 {
 	Case tmp;
