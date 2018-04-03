@@ -38,12 +38,13 @@ Mouvement *IA(Case **plateau, int taille, char couleur, int niveau_ia)
 		nb_mouv = GenererMouvements(plateau, taille, mouvs, couleur, 2, &priorite_max);
 
 		index = rand() % nb_mouv;
+        printf("index : %d\n", index);
 
 		// Prend le premier mouvement de priorite la plus haute parmit la liste
 		// de mouvements. Parcour la liste de manière circulaire en commencant à
 		// un index aléatoire pour mieux réparir les coups sur le plateau de
 		// jeu.
-		for (int x = 0; mouvs[index].valeur != priorite_max || x < nb_mouv; index++, x++)
+		for (int x = 0; mouvs[index].valeur != priorite_max && x < nb_mouv; index++, x++)
 		{
 			if (index == nb_mouv-1)
 				index = 0;

@@ -49,10 +49,6 @@ void cleanup()
                 puts("Erreur lors de la sauvegarde..");
         }
     }
-
-	FreePlateau(plateau, taille);
-
-    gr_close_graph();
 }
 
 int main(int argc, char *argv[])
@@ -162,7 +158,8 @@ int main(int argc, char *argv[])
 	printf("Rouge : %d pts\n", rouge);
 	printf("Noir : %d pts\n", noir);
 
-	FreePlateau(plateau, taille);
+    if (plateau)
+	    FreePlateau(plateau, taille);
 
     gr_close_graph();
 
